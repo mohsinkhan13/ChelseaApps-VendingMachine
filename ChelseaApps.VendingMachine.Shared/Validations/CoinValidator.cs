@@ -6,20 +6,11 @@ namespace ChelseaApps.VendingMachine.Shared.Validations
     {
         private readonly List<decimal> _acceptedCoins;
 
-
-
-        public CoinValidator()
+        public CoinValidator(List<decimal> acceptedCoins)
         {
-            _acceptedCoins = new List<decimal>
-            {
-                0.05m,
-                0.10m,
-                0.20m,
-                0.50m,
-                1.00m,
-                2.00m
-            };
+            _acceptedCoins = acceptedCoins;
         }
+
         public bool Contains(decimal value)
         {
             return _acceptedCoins.Contains(value);

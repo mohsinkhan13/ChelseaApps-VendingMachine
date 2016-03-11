@@ -7,5 +7,6 @@ namespace ChelseaApps.VendingMachine.Repositories
     {
         IEnumerable<Product> GetAll();
         Product Get(string productNumber);
+        void DecrementProductQuantity(string productNumber, int decrementBy);
     }
 }

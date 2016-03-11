@@ -1,25 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ChelseaApps.VendingMachine.Repositories;
 using ChelseaApps.VendingMachine.Shared.DataModels;
 using ChelseaApps.VendingMachine.Shared.Exceptions;
-using ChelseaApps.VendingMachine.Shared.Validations;
 
 namespace ChelseaApps.VendingMachine.UI
 {
     class Program
     {
-        //TODO use IOC
-        private static readonly IProductRepository _repository = new StaticProductRepository();
-        private static readonly ICurrencyValidator _validator = new CoinValidator();
+        private static readonly VendingMachine _machine = new VendingMachine();
         
         static void Main(string[] args)
         {
-
-            var productList = GetProductList().ToList();
-            Product product = null;
-            var userCoins = new List<decimal>();
+            
+            var productList = _machine.GetProducts().ToList();
+            
 
             do
             {
@@ -29,9 +24,14 @@ namespace ChelseaApps.VendingMachine.UI
 
                 try
                 {
-                    product = GetUserselectedProduct(productNumber);
+                    _machine.SelectUserProductChoice(productNumber);
                 }
                 catch (ProductNotFoundException e)
+                {
+                    Console.WriteLine(e.Message);
+                    continue;
+                }
+                catch (ProductOutOfStockException e)
                 {
                     Console.WriteLine(e.Message);
                     continue;
@@ -43,57 +43,44 @@ namespace ChelseaApps.VendingMachine.UI
                     decimal coin;
                     decimal.TryParse(GetCoin(), out coin);
 
-                    if (!_validator.Contains(coin))
+                    try
                     {
-                        Console.WriteLine("This machine only accepts 10p,20p,50p,£1,£2");
-                        continue;
+                        _machine.AcceptUserCoin(coin);
                     }
-                    userCoins.Add(coin);
-                    var sum = userCoins.Sum();
-                    if (sum < product.Price)
+	                catch (InvalidCoinException e)
+	                {
+	                    Console.WriteLine(e.Message);
+                        continue;
+	                }
+
+                    var remainingAmount = _machine.GetRemainingAmoutToBePaid();
+                    if (remainingAmount > 0)
                     {
-                        Console.WriteLine(string.Format("£{0} remaining:", product.Price - sum));
+                        Console.WriteLine(string.Format("£{0} remaining:", remainingAmount));
                         continue;
                     }
 
-                    if (sum > product.Price)
+                    Console.WriteLine("Vending product . . .");
+
+                    if (_machine.AnyChangeToGive)
                     {
-                        //DispenseChange(product.Price, sum);
+                        var change = _machine.GetChange();
+                        Console.WriteLine("Thank you, please take your change:");
+
+                        foreach (var changeCoin in change)
+                        {
+                            Console.WriteLine(string.Format("£{0}", changeCoin));
+                        }
                     }
 
                     break;
 
-                } while (true);
+                } while (!_machine.UserHasPaidFullAmount);
             } while (true);
             
         }
 
-        private static List<decimal> DispenseChange(decimal price, decimal sum)
-        {
-            var returnedChange = new List<decimal>();
-            var toReturn = sum - price;
-            while (toReturn != 0)
-            {
-                if (_validator.Contains(toReturn))
-                {
-                    returnedChange.Add(toReturn);
-                    toReturn = 0;
-                }
-
-
-            }
-
-        }
-
-        private static Product GetUserselectedProduct(string productNumber)
-        {
-            var product = _repository.Get(productNumber);
-            if (product == null)
-                throw new ProductNotFoundException("Product not found");
-
-            return product;
-        }
-
+        
         private static string GetUserInput()
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
@@ -122,10 +109,6 @@ namespace ChelseaApps.VendingMachine.UI
             }
         }
 
-        private static IEnumerable<Product> GetProductList()
-        {
-            var productList = _repository.GetAll();
-            return productList;
-        }
+        
     }
 }

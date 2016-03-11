@@ -23,19 +23,27 @@ namespace ChelseaApps.VendingMachine.Repositories
             return _products.FirstOrDefault(x => x.ProductNumber == productNumber);
         }
 
+        public void DecrementProductQuantity(string productNumber, int decrementBy)
+        {
+            var product = _products.FirstOrDefault(x => x.ProductNumber == productNumber);
+            if(product!= null)
+                product.Stock -= decrementBy;
+        }
+
+
         private IEnumerable<Product> InitialiseProductsList()
         {
             return new List<Product>
             {
-                new Product {ProductNumber = "1", Stock = 10, Price = 1.50m, ProductTitle = "A"},
-                new Product {ProductNumber = "2", Stock = 10, Price = 1.00m, ProductTitle = "B"},
-                new Product {ProductNumber = "3", Stock = 10, Price = 1.70m, ProductTitle = "C"},
-                new Product {ProductNumber = "4", Stock = 10, Price = 2.00m, ProductTitle = "D"},
-                new Product {ProductNumber = "5", Stock = 10, Price = 0.50m, ProductTitle = "E"},
-                new Product {ProductNumber = "6", Stock = 10, Price = 0.20m, ProductTitle = "F"},
-                new Product {ProductNumber = "7", Stock = 10, Price = 1.60m, ProductTitle = "G"},
-                new Product {ProductNumber = "8", Stock = 10, Price = 3.50m, ProductTitle = "H"},
-                new Product {ProductNumber = "9", Stock = 10, Price = 0.40m, ProductTitle = "I"}
+                new Product {ProductNumber = "1", Stock = 0, Price =  0.80m, ProductTitle = "Coca Cola 330ml"},
+                new Product {ProductNumber = "2", Stock = 10, Price = 0.80m, ProductTitle = "Coke Zero 330ml"},
+                new Product {ProductNumber = "3", Stock = 10, Price = 0.80m, ProductTitle = "Fanta 330ml"},
+                new Product {ProductNumber = "4", Stock = 10, Price = 0.80m, ProductTitle = "Sprite 330ml"},
+                new Product {ProductNumber = "5", Stock = 10, Price = 1.20m, ProductTitle = "Coca Cola 500ml"},
+                new Product {ProductNumber = "6", Stock = 10, Price = 1.20m, ProductTitle = "Coke Zero 500ml"},
+                new Product {ProductNumber = "7", Stock = 10, Price = 1.20m, ProductTitle = "Fanta 500ml"},
+                new Product {ProductNumber = "8", Stock = 10, Price = 1.20m, ProductTitle = "Sprite 500ml"},
+                new Product {ProductNumber = "9", Stock = 10, Price = 1.00m, ProductTitle = "Water 500ml"}
             };
         }
     }
