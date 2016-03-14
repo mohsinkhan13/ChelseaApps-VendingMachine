@@ -8,6 +8,9 @@ using ChelseaApps.VendingMachine.Shared.Validations;
 
 namespace ChelseaApps.VendingMachine.UI
 {
+    //TODO Implement IOC
+    //TODO refactor
+    //TODO add unit tests
     public class VendingMachine
     {
         private readonly IProductRepository _repository;

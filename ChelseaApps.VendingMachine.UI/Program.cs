@@ -8,6 +8,7 @@ namespace ChelseaApps.VendingMachine.UI
 {
     class Program
     {
+        //TODO implement IOC
         private static readonly VendingMachine _machine = new VendingMachine();
         
         static void Main(string[] args)
